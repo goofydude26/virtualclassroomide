@@ -1,0 +1,114 @@
+:root {
+    /* Light Mode (Default) */
+    --bg-color: #ffffff;
+    --sidebar-bg: #f7f7f5;
+    --text-color: #37352f;
+    --border-color: #e9e9e7;
+    --hover-bg: #efefef;
+    --accent-color: #2eaadc; /* Notion Blue-ish */
+    --sidebar-width: 240px;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+[data-theme="dark"] {
+    /* Dark Mode */
+    --bg-color: #191919;
+    --sidebar-bg: #202020;
+    --text-color: #d4d4d4;
+    --border-color: #303030;
+    --hover-bg: #2c2c2c;
+    --accent-color: #3fa2db;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Sidebar Layout */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    height: 100%;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.sidebar-header {
+    margin-bottom: 24px;
+    font-weight: 600;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-links {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    text-decoration: none;
+    color: var(--text-color);
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+    background-color: var(--hover-bg);
+}
+
+.theme-toggle {
+    margin-top: auto;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.theme-toggle:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 48px 64px; /* Notion-like padding */
+    max-width: 900px; /* Readability constraint */
+    margin: 0 auto; /* Center content if screen is huge */
+    width: 100%;
+}
+
+h1, h2, h3 {
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+input, button {
+    font-family: inherit;
+}

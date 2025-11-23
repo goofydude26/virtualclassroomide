@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: virtual-classroom
+    env: docker
+    plan: free
+    envVars:
+      - key: MONGO_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_SECRET_KEY
+        sync: false
+      - key: PORT
+        value: 8000

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Classroom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <span>Classroom</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-item" onclick="showSection('courses')">📚 All Courses</a>
+            <a href="#" class="nav-item" onclick="showSection('profile')">👤 My Profile</a>
+            <a href="#" class="nav-item" onclick="showSection('settings')">⚙️ Settings</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div id="courses-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h1>All Courses</h1>
+                <div style="display: flex; gap: 8px;">
+                    <button id="join-class-btn"
+                        style="width: auto; display: none; background: var(--sidebar-bg); color: var(--text-color); border: 1px solid var(--border-color);"
+                        onclick="openModal('joinClassModal')">Join via Code</button>
+                    <button id="create-class-btn" style="width: auto; display: none;"
+                        onclick="openModal('createClassModal')">+ Create Class</button>
+                </div>
+            </div>
+
+            <div id="pending-requests-container"
+                style="display: none; margin-bottom: 24px; padding: 16px; background: var(--sidebar-bg); border-radius: 8px;">
+                <h3>🔔 Pending Requests</h3>
+                <div id="pending-list"></div>
+            </div>
+
+            <!-- Course List will be injected here -->
+            <div id="course-list"></div>
+        </div>
+
+        <div id="profile-section" style="display: none; max-width: 1000px; margin: 0 auto; padding-top: 20px;">
+            <div style="display: grid; grid-template-columns: 280px 1fr; gap: 32px;">
+                <!-- Left Sidebar -->
+                <div class="profile-sidebar">
+                    <div
+                        style="width: 260px; height: 260px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 64px; color: white; border: 1px solid var(--border-color); overflow: hidden;">
+                        <span id="profile-avatar">👤</span>
+                    </div>
+                    <h1 id="profile-name" style="margin-top: 16px; font-size: 24px; line-height: 1.2;">User Name</h1>
+                    <p id="profile-role" style="color: #666; font-size: 20px; font-weight: 300; margin-bottom: 16px;">
+                        Role</p>
+
+                    <button
+                        style="width: 100%; margin-bottom: 16px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color);">Edit
+                        Profile</button>
+
+                    <div style="font-size: 14px; color: var(--text-color);">
+                        <div style="margin-bottom: 8px;">📧 <span id="profile-email">email@example.com</span></div>
+                        <div>🏫 Virtual Classroom</div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="profile-main">
+                    <div style="margin-bottom: 32px;">
+                        <h3
+                            style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">
+                            Pinned Classes</h3>
+                        <div id="pinned-courses"
+                            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                            <!-- Course Cards injected here -->
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-section" style="display: none; max-width: 600px; margin: 0 auto;">
+            <h1>Settings</h1>
+            <div
+                style="background: var(--sidebar-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; margin-top: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h3 style="margin-bottom: 4px;">Appearance</h3>
+                        <p style="color: #666; font-size: 14px;">Switch between light and dark mode.</p>
+                    </div>
+                    <button onclick="toggleTheme()"
+                        style="width: auto; padding: 8px 16px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color);">🌓
+                        Toggle Theme</button>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 24px;">
+                    <h3 style="margin-bottom: 4px; color: #e03e3e;">Danger Zone</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 16px;">Sign out of your account.</p>
+                    <button onclick="logout()"
+                        style="width: 100%; padding: 12px; background: #e03e3e; color: white; border: none; font-weight: 600;">Sign
+                        Out</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Join Class Modal -->
+    <div id="joinClassModal" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div
+            style="background: var(--bg-color); padding: 24px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color);">
+            <h2>Join Class</h2>
+            <div class="form-group" style="margin-top: 16px;">
+                <label>Class Code</label>
+                <input type="text" id="join-code" style="width: 100%; padding: 8px; margin-top: 4px;"
+                    placeholder="e.g. a1b2c3d4">
+            </div>
+            <div style="margin-top: 24px; display: flex; gap: 8px; justify-content: flex-end;">
+                <button onclick="closeModal('joinClassModal')"
+                    style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color);">Cancel</button>
+                <button onclick="joinClass()">Join</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Class Modal -->
+    <div id="createClassModal" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div
+            style="background: var(--bg-color); padding: 24px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color);">
+            <h2>Create New Class</h2>
+            <div class="form-group" style="margin-top: 16px;">
+                <label>Class Name</label>
+                <input type="text" id="new-class-name" style="width: 100%; padding: 8px; margin-top: 4px;">
+            </div>
+            <div class="form-group" style="margin-top: 16px;">
+                <label>Description</label>
+                <input type="text" id="new-class-desc" style="width: 100%; padding: 8px; margin-top: 4px;">
+            </div>
+            <div style="margin-top: 24px; display: flex; gap: 8px; justify-content: flex-end;">
+                <button onclick="closeModal('createClassModal')"
+                    style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color);">Cancel</button>
+                <button onclick="createClass()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Logic
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+
+        // Simple Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.main-content > div').forEach(div => {
+                div.style.display = 'none';
+            });
+            document.getElementById(sectionId + '-section').style.display = 'block';
+
+            if (sectionId === 'courses') {
+                loadCourses();
+                checkTeacherAccess();
+            } else if (sectionId === 'profile') {
+                loadProfile();
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        async function checkTeacherAccess() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch('/users/me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (response.ok) {
+                    const user = await response.json();
+                    if (user.role === 'teacher' || user.role === 'admin') {
+                        document.getElementById('create-class-btn').style.display = 'block';
+                        loadPendingRequests();
+                    } else {
+                        document.getElementById('join-class-btn').style.display = 'block';
+                    }
+                } else {
+                    console.error('checkTeacherAccess failed', response.status);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function joinClass() {
+            const code = document.getElementById('join-code').value;
+            const token = localStorage.getItem('token');
+
+            try {
+                const res = await fetch('/classes/join', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ class_code: code })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeModal('joinClassModal');
+                    alert(data.message);
+                    loadCourses();
+                } else {
+                    alert(`Join Failed.\nStatus: ${res.status}\nError: ${data.detail || JSON.stringify(data)}`);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Network error during join.');
+            }
+        }
+
+        async function createClass() {
+            const name = document.getElementById('new-class-name').value;
+            const desc = document.getElementById('new-class-desc').value;
+            const token = localStorage.getItem('token');
+
+            try {
+                const res = await fetch('/classes/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ name, description: desc })
+                });
+                if (res.ok) {
+                    closeModal('createClassModal');
+                    loadCourses();
+                    alert('Class created!');
+                } else {
+                    const err = await res.json();
+                    alert(`Create Failed.\nStatus: ${res.status}\nError: ${err.detail || JSON.stringify(err)}`);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Network error during create.');
+            }
+        }
+
+        async function loadPendingRequests() {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch('/classes/pending', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const classes = await res.json();
+                    const container = document.getElementById('pending-requests-container');
+                    const list = document.getElementById('pending-list');
+
+                    if (classes.length > 0) {
+                        container.style.display = 'block';
+                        list.innerHTML = classes.map(c => `
+                            <div style="margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <strong>${c.name}</strong> has pending requests:
+                                <div style="margin-top: 4px;">
+                                    ${c.pending_requests.map(uid => `
+                                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                                            <span>Student ID: ${uid}</span>
+                                            <button onclick="approveStudent('${c._id}', '${uid}')" style="padding: 2px 8px; font-size: 12px;">Approve</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        container.style.display = 'none';
+                    }
+                } else {
+                    console.error('loadPendingRequests failed', res.status);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function approveStudent(classId, studentId) {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`/classes/${classId}/approve?student_id=${studentId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    loadPendingRequests();
+                    alert('Student approved');
+                } else {
+                    const err = await res.json();
+                    alert(`Approve Failed.\nStatus: ${res.status}\nError: ${err.detail || JSON.stringify(err)}`);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Network error during approve.');
+            }
+        }
+
+        async function loadCourses() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch('/classes', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (response.ok) {
+                    const courses = await response.json();
+                    const list = document.getElementById('course-list');
+                    list.innerHTML = courses.map(c => `
+                        <div style="padding: 16px; border: 1px solid var(--border-color); margin-bottom: 8px; border-radius: 4px;">
+                            <h3>${c.name}</h3>
+                            <p>${c.description || 'No description'}</p>
+                            <p><strong>Code:</strong> ${c.class_code}</p>
+                            <div style="margin-top: 8px;">
+                                <a href="/static/pages/classroom.html?id=${c._id}" style="color: var(--accent-color);">Go to Class</a>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    console.error('loadCourses failed', response.status);
+                    const err = await response.json();
+                    alert(`Load Courses Failed.\nStatus: ${response.status}\nError: ${err.detail || JSON.stringify(err)}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error loading courses.');
+            }
+        }
+
+        async function loadProfile() {
+            const token = localStorage.getItem('token');
+            try {
+                // 1. Get User Info
+                const res = await fetch('/users/me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const user = await res.json();
+                    document.getElementById('profile-name').innerText = user.email.split('@')[0];
+                    document.getElementById('profile-email').innerText = user.email;
+                    document.getElementById('profile-role').innerText = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+                    document.getElementById('profile-avatar').innerText = user.email.charAt(0).toUpperCase();
+                } else {
+                    console.error('loadProfile (user) failed', res.status);
+                }
+
+                // 2. Get Courses for "Pinned" section
+                const coursesRes = await fetch('/classes', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (coursesRes.ok) {
+                    const courses = await coursesRes.json();
+                    const pinnedContainer = document.getElementById('pinned-courses');
+                    const pinned = courses.slice(0, 6);
+
+                    if (pinned.length === 0) {
+                        pinnedContainer.innerHTML = '<p style="color: #666; font-style: italic;">No classes yet.</p>';
+                    } else {
+                        pinnedContainer.innerHTML = pinned.map(c => `
+                            <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 16px; background: var(--bg-color);">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                    <span style="font-size: 14px;">📚</span>
+                                    <a href="#" onclick="showSection('courses')" style="font-weight: 600; color: var(--accent-color); text-decoration: none;">${c.name}</a>
+                                    <span style="font-size: 12px; border: 1px solid var(--border-color); border-radius: 10px; padding: 0 6px; color: #666;">Public</span>
+                                </div>
+                                <p style="font-size: 12px; color: #666; margin-bottom: 16px; height: 32px; overflow: hidden;">${c.description || 'No description available.'}</p>
+                                <div style="font-size: 12px; display: flex; gap: 16px; color: #666;">
+                                    <span>🟢 Python</span>
+                                    <span>⭐ 1</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    console.error('loadProfile (courses) failed', coursesRes.status);
+                }
+
+            } catch (e) { console.error(e); }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+
+        // Initial Load
+        if (localStorage.getItem('token')) {
+            showSection('courses');
+        } else {
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+
+</html>
