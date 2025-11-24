@@ -5,9 +5,11 @@ from app.database import db
 from app.auth import get_password_hash, verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_active_user
 from datetime import timedelta
 
+import os
+
 router = APIRouter()
 
-ADMIN_SECRET_KEY = "MASTER_KEY"
+ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET_KEY", "MASTER_KEY")
 
 @router.post("/register", response_model=UserResponse)
 async def register(user: UserRegister):

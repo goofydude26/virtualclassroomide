@@ -130,7 +130,7 @@
                 }
             } catch (err) {
                 console.error('Network error:', err);
-                alert('Network error. Please check your connection and console logs.');
+                alert(`Network error: ${err.message}\nPlease check your connection and console logs.`);
             }
         });
     </script>
