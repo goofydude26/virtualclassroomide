@@ -404,14 +404,14 @@
         function logout() {
             localStorage.removeItem('token');
             localStorage.removeItem('role');
-            window.location.href = '/login.html';
+            window.location.href = '/login';
         }
 
         // Initial Load
         if (localStorage.getItem('token')) {
             showSection('courses');
         } else {
-            window.location.href = '/login.html';
+            window.location.href = '/login';
         }
     </script>
 </body>

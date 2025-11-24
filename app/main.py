@@ -28,3 +28,7 @@ async def login_page():
 @app.get("/register")
 async def register_page():
     return RedirectResponse(url="/static/pages/register.html")
+
+@app.get("/login.html")
+async def login_html_redirect():
+    return RedirectResponse(url="/static/pages/login.html")

@@ -7,8 +7,10 @@ from fastapi.security import OAuth2PasswordBearer
 from app.database import db
 from app.models import TokenData, UserInDB
 
+import os
+
 # Configuration
-SECRET_KEY = "YOUR_SUPER_SECRET_KEY_CHANGE_THIS_IN_PROD"
+SECRET_KEY = os.getenv("SECRET_KEY", "YOUR_SUPER_SECRET_KEY_CHANGE_THIS_IN_PROD")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

@@ -266,7 +266,7 @@
         // --- Initialization ---
         async function init() {
             const token = localStorage.getItem('token');
-            if (!token) window.location.href = '/login.html';
+            if (!token) window.location.href = '/login';
 
             try {
                 const userRes = await fetch('/users/me', { headers: { 'Authorization': 'Bearer ' + token } });
@@ -408,6 +408,17 @@
                         connections.forEach(conn => { if (conn.peer !== c.peer) conn.send(data); });
                     });
                 });
+
+                // Handle incoming calls (Student joining stream)
+                peer.on('call', (call) => {
+                    log('Incoming call from ' + call.peer);
+                    if (localStream) {
+                        log('Answering call...');
+                        call.answer(localStream);
+                    } else {
+                        log('Call received but stream not ready.');
+                    }
+                });
             } else {
                 peer = new Peer(null, { debug: 2 });
                 peer.on('open', (id) => {
@@ -439,10 +450,8 @@
                 document.getElementById('main-video').muted = true;
                 document.getElementById('placeholder').style.display = 'none';
                 updateStatus('Live 🔴');
-                peer.on('call', (call) => {
-                    log('Answering call from ' + call.peer);
-                    call.answer(localStream);
-                });
+                // Notify connected students
+                connections.forEach(c => c.send({ type: 'stream-started' }));
             } catch (err) {
                 log('Camera Error: ' + err.message);
                 console.error(err);
@@ -455,33 +464,66 @@
             updateStatus('Connecting...');
 
             // Data Connection
-            conn = peer.connect(classId);
-            conn.on('open', () => {
-                log('Data connection established.');
-                updateStatus('Connected');
-                conn.send({ type: 'join', user: currentUser.email });
-            });
-            conn.on('error', (err) => log('Data Conn Error: ' + err));
-            conn.on('data', (data) => handleData(data));
+            if (!conn) {
+                conn = peer.connect(classId);
+                conn.on('open', () => {
+                    log('Data connection established.');
+                    updateStatus('Connected');
+                    conn.send({ type: 'join', user: currentUser.email });
+                    callTeacher();
+                });
+                conn.on('error', (err) => log('Data Conn Error: ' + err));
+                conn.on('data', (data) => handleData(data));
+            } else {
+                callTeacher();
+            }
+        }
 
-            // Media Call
+        let currentCall = null;
+
+        function createDummyStream() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1;
+            canvas.height = 1;
+            const stream = canvas.captureStream();
+            return stream;
+        }
+
+        function callTeacher() {
+            if (currentCall) currentCall.close();
             log('Calling teacher...');
-            const call = peer.call(classId, new MediaStream()); // Sending empty stream
+
+            const dummyStream = createDummyStream();
+            const call = peer.call(classId, dummyStream);
+            currentCall = call;
 
             call.on('stream', (remoteStream) => {
                 log('Remote stream received!');
-                document.getElementById('main-video').srcObject = remoteStream;
-                document.getElementById('main-video').play();
+                const video = document.getElementById('main-video');
+                video.srcObject = remoteStream;
+                video.play().catch(e => log('Play Error: ' + e));
                 document.getElementById('placeholder').style.display = 'none';
                 updateStatus('Watching 🟢');
             });
+
             call.on('error', (err) => log('Call Error: ' + err));
             call.on('close', () => log('Call Closed'));
+
+            // Debug ICE state
+            if (call.peerConnection) {
+                call.peerConnection.oniceconnectionstatechange = () => {
+                    log('ICE State: ' + call.peerConnection.iceConnectionState);
+                };
+            }
         }
 
         function handleData(data) {
             if (data.type === 'chat') addMessage(data.user, data.text);
             else if (data.type === 'join') addParticipant(data.user);
+            else if (data.type === 'stream-started') {
+                log('Teacher started stream. Connecting...');
+                callTeacher();
+            }
         }
 
         function handleChat(e) {
