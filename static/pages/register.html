@@ -125,11 +125,12 @@
                     window.location.href = '/login';
                 } else {
                     let errorMsg;
-                    try {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
                         const error = await response.json();
                         errorMsg = error.detail || JSON.stringify(error);
-                    } catch (e) {
-                        // Not JSON, probably HTML error page
+                    } else {
+                        // HTML error page
                         errorMsg = await response.text();
                     }
                     console.error('Registration error:', errorMsg);
