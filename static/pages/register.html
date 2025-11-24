@@ -124,9 +124,16 @@
                     alert('Registration successful! Please login.');
                     window.location.href = '/login';
                 } else {
-                    const error = await response.json();
-                    console.error('Registration error:', error);
-                    alert(`Registration Failed.\nStatus: ${response.status}\nError: ${error.detail || JSON.stringify(error)}`);
+                    let errorMsg;
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.detail || JSON.stringify(error);
+                    } catch (e) {
+                        // Not JSON, probably HTML error page
+                        errorMsg = await response.text();
+                    }
+                    console.error('Registration error:', errorMsg);
+                    alert(`Registration Failed.\nStatus: ${response.status}\nError: ${errorMsg.substring(0, 500)}`);
                 }
             } catch (err) {
                 console.error('Network error:', err);
